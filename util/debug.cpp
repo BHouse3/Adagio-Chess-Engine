@@ -16,7 +16,37 @@ void printBitboard(const Bitboard& board, std::ostream& out) {
 
 void verifyBoardState(const cBoard& cb, std::ostream& out)
 {
-    out << "White Pawns\n\n";
+    char piece;
+    Square sq;
+    pieceCode pieceAtSquare;
+    for (int rank = 7; rank >= 0; --rank)
+    {
+        for (int file = 0; file < 8; file++)
+        {
+            sq = rank*8 + file;
+            pieceAtSquare = cb.pieceBySquare(sq);
+            switch (pieceAtSquare)
+            {
+                case (W_PAWN): piece = 'P'; break;
+                case (W_KNIGHT): piece = 'N'; break;
+                case (W_BISHOP): piece = 'B'; break;
+                case (W_ROOK): piece = 'R'; break;
+                case (W_QUEEN): piece = 'Q'; break;
+                case (W_KING): piece = 'K'; break;
+                case (B_PAWN): piece = '6'; break;
+                case (B_KNIGHT): piece = 'n'; break;
+                case (B_BISHOP): piece = 'b'; break;
+                case (B_ROOK): piece = 'r'; break;
+                case (B_QUEEN): piece = 'q'; break;
+                case (B_KING): piece = 'k'; break;
+                default: piece = '.'; break;
+            }
+            out << std::setw(5) << piece << " ";
+        }
+        out << std::endl;
+    }
+
+    out << "\n\nWhite Pawns\n\n";
     printBitboard(cb.pieces(WHITE, PAWN), out); 
     out << "\nBlack Pawns\n\n";
     printBitboard(cb.pieces(BLACK, PAWN), out);
@@ -71,4 +101,15 @@ void verifyBoardState(const cBoard& cb, std::ostream& out)
 
     out << "\n\nHalf Move Counter: " << cb.halfmoveClock();
     out << "\n\nFull Move Counter: " << cb.fullmoveNumber();
+}
+
+void decodeHexMove(std::string& hexMove, std::ostream& out)
+{
+    int moveToMake = std::stoi(hexMove, nullptr, 16);
+
+    int destSquare = moveToMake & 0x0000003F;
+    int sourceSquare = (moveToMake & 0x00000FC0) >> 6;
+    int special = (moveToMake & 0x0000F000) >> 12; 
+
+    out << "Destination Square: " << destSquare << "\nsourceSquare: " << sourceSquare << "\nSpecial Code: " << special << "\n\n";
 }
