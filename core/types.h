@@ -43,7 +43,7 @@ enum Side : int
     NO_SIDE = -1
 };
 
-enum pieceType : int 
+enum pieceType : int8_t 
 {
     PAWN = 0,
     KNIGHT = 1,
@@ -52,6 +52,25 @@ enum pieceType : int
     QUEEN = 4,
     KING = 5,
     NO_PIECE = -1
+};
+
+enum pieceCode : int8_t
+{
+    EMPTY = -1,
+
+    W_PAWN = 0,
+    W_KNIGHT = 1,
+    W_BISHOP = 2,
+    W_ROOK = 3,
+    W_QUEEN = 4,
+    W_KING = 5,
+
+    B_PAWN = 6,
+    B_KNIGHT = 7,
+    B_BISHOP = 8,
+    B_ROOK = 9,
+    B_QUEEN = 10,
+    B_KING = 11
 };
 
 
@@ -81,15 +100,20 @@ enum moveFlags : int
     QUEEN_PROMO_CAPTURE = 15
 };
 
-inline Side oppositeSide(Side side) {return side == Side::WHITE ? Side::BLACK : Side::WHITE;}
+inline Side oppositeSide(Side& side) {return side == Side::WHITE ? Side::BLACK : Side::WHITE;}
 
-inline Move encodeMove(Square source, Square dest, int specInfo) 
+inline Move encodeMove(Square& source, Square& dest, int& specInfo) 
 {
     return (specInfo << 12) | (dest << 6) | source;
 }
 
-inline Square sourceSquare(Move move) {return move & 0x3F;}
-inline Square destSquare(Move move) {return (move >> 6) & 0x3F;}
-inline int moveSpecInfo(Move move) {return static_cast<int> (move>>12) & 0xF;}
+inline Square sourceSquare(Move& move) {return move & 0x3F;}
+inline Square destSquare(Move& move) {return (move >> 6) & 0x3F;}
+inline int moveSpecInfo(Move& move) {return static_cast<int> (move>>12) & 0xF;}
 
-inline Bitboard fenMask(int x, int y) {return ((1ULL << ((8*x) + y)));}
+inline pieceType getPieceType(pieceCode& pc) {
+    if (pc == EMPTY) {return NO_PIECE;}
+    return static_cast<pieceType>(pc % 6);
+}
+
+inline Bitboard fenMask(int& x, int& y) {return ((1ULL << ((8*x) + y)));}
