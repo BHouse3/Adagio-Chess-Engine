@@ -5,14 +5,19 @@
 #pragma once
 
 #include <vector>
+#include <stack>
 #include <string>
 #include <cassert>
 #include <sstream>
+#include <iostream>
+#include <cstring>
+#include <iomanip>
 #include "types.h"
 #include "zobrist.h"
 
 
-class cBoard {
+class cBoard 
+{
     public:
         void setFromFEN(const std::string& FEN);
         
@@ -30,6 +35,7 @@ class cBoard {
         Bitboard pieces(Side side, pieceType pt) const;
         Bitboard occupied (Side side) const;
         Bitboard allOccupied() const;
+        pieceCode pieceBySquare(Square sq) const;
         Square kingSquare(Side side) const;
 
         Side sideToMove() const;
@@ -43,7 +49,9 @@ class cBoard {
         Bitboard pieceBB[2][6];
         Bitboard occupancy[2];
         Bitboard allOccupiedSquares;
+        
         Square kingSq[2];
+        pieceCode pieceMailbox[64];
 
         Side stm;
         Square enPassant;
@@ -54,13 +62,13 @@ class cBoard {
 
         struct Undo 
         {
+            uint64_t hash;
             Move move;
-            Square capturedSq;
             int castling;
             Square enPassant;
+            pieceType capturedPiece;
             int halfmove;
-            uint64_t hash;
         };
 
-        std::vector<Undo> history;
+        std::stack<Undo> history;
 };
