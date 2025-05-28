@@ -32,17 +32,17 @@ class cBoard
         bool isSquareAttacked(Square sq, Side attackingSide) const;
         bool inCheck(Side side) const;
 
-        Bitboard pieces(Side side, pieceType pt) const;
-        Bitboard occupied (Side side) const;
-        Bitboard allOccupied() const;
-        pieceCode pieceBySquare(Square sq) const;
-        Square kingSquare(Side side) const;
+        inline Bitboard pieces(Side side, pieceType pt) const {return pieceBB[side][pt];}
+        inline Bitboard occupied(Side side) const {return occupancy[side];}
+        inline Bitboard allOccupied() const {return allOccupiedSquares;}
+        inline pieceCode pieceBySquare(Square sq) const {return pieceMailbox[sq];}
+        inline Square kingSquare(Side side) const {return kingSq[side];}
+        inline Side sideToMove() const {return stm;}
+        inline Square enPassantSquare() const {return enPassant;}
+        inline int castlingRights() const {return castling;}
+        inline int halfmoveClock() const {return halfmoveCounter;}
+        inline int fullmoveNumber() const {return fullmoveCounter;}
 
-        Side sideToMove() const;
-        Square enPassantSquare() const;
-        int castlingRights() const;
-        int halfmoveClock() const;
-        int fullmoveNumber() const;
         uint64_t hash() const;
 
     private:

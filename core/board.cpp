@@ -493,15 +493,4 @@ bool cBoard::inCheck(Side side) const
     //maybe there's a more optimal approach 
 }
 
-Bitboard cBoard::pieces(Side side, pieceType pt) const {return pieceBB[side][pt];}
-Bitboard cBoard::occupied(Side side) const {return occupancy[side];}
-Bitboard cBoard::allOccupied() const {return allOccupiedSquares;}
-pieceCode cBoard::pieceBySquare(Square sq) const {return pieceMailbox[sq];}
-Square cBoard::kingSquare(Side side) const {return kingSq[side];}
-Side cBoard::sideToMove() const {return stm;}
-Square cBoard::enPassantSquare() const {return enPassant;}
-int cBoard::castlingRights() const {return castling;}
-int cBoard::halfmoveClock() const {return halfmoveCounter;}
-int cBoard::fullmoveNumber() const {return fullmoveCounter;}
-
 uint64_t cBoard::hash() const {}
