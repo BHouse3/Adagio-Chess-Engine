@@ -14,6 +14,9 @@
 #include <iomanip>
 #include "types.h"
 #include "zobrist.h"
+#include "../util/magicBitboards.h"
+#include "../util/kingLookup.h"
+#include "../util/knightLookup.h"
 
 
 class cBoard 
@@ -71,4 +74,17 @@ class cBoard
         };
 
         std::stack<Undo> history;
+
+        template<Side color>
+        inline Bitboard westPawnAttacksBoard(const Bitboard pawns) const
+        {
+            return (color == WHITE) ? ((pawns << 7) & 0x7F7F7F7F7F7F7F7F) : ((pawns >> 9) & 0x7F7F7F7F7F7F7F7F); 
+        }
+
+        template<Side color>
+        inline Bitboard eastPawnAttacksBoard(const Bitboard pawns) const 
+        {
+            return (color == WHITE) ? ((pawns << 9) & 0xFEFEFEFEFEFEFEFE) : ((pawns >> 7) & 0xFEFEFEFEFEFEFEFE);
+        }
+
 };

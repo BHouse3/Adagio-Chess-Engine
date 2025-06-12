@@ -229,6 +229,8 @@ void cBoard::resetBoard()
     pieceBB[BLACK][KING] = 0x1000000000000000ULL;
     pieceMailbox[60] = B_KING;
 
+    for (int i = 16; i < 48; i++) {pieceMailbox[i] = EMPTY;}
+
     occupancy[WHITE] = 0x000000000000FFFFULL;
     occupancy[BLACK] = 0xFFFF000000000000ULL;
     allOccupiedSquares = 0xFFFF00000000FFFFULL;
@@ -485,12 +487,63 @@ bool cBoard::isSquareAttacked(Square sq, Side attackingSide) const
     //Can be implemented by seeing if sq aligns with any of the attacking bitboards/lookuptables 
     //Obviously if there's alignment then the square is attacked
     //attack tables & (1ULL << sq);
+
+    const Bitboard sqToCheck = 1ULL << sq;
+
+    Bitboard pawnAttack = 0;
+    // Bitboard kingAttack = 0;
+
+    const Bitboard pawns = pieceBB[attackingSide][PAWN];
+    Bitboard knights = pieceBB[attackingSide][KNIGHT];
+    Bitboard bishops = pieceBB[attackingSide][BISHOP];
+    Bitboard rooks = pieceBB[attackingSide][ROOK];
+    Bitboard queens = pieceBB[attackingSide][QUEEN];
+    Bitboard kings = pieceBB[attackingSide][KING];
+
+    pawnAttack = (attackingSide == WHITE) ? (eastPawnAttacksBoard<WHITE>(pawns) | westPawnAttacksBoard<WHITE>(pawns)) : (eastPawnAttacksBoard<BLACK>(pawns) | westPawnAttacksBoard<BLACK>(pawns));
+    if (pawnAttack & sqToCheck) {return true;}
+
+    if (knights & knightAttacks[sq]) {return true;}
+
+    // while (knights)
+    // {
+    //     const int sq = __builtin_ctzll(knights);
+    //     if (knightAttacks[sq] & sqToCheck) {return true;}
+    //     knights &= knights-1;
+    // }
+
+    // kingAttack = kingAttacks[kingSq[attackingSide]];
+    if (kings & kingAttacks[sq]) {return true;}
+
+    while (bishops)
+    {
+        const int sq = __builtin_ctzll(bishops);
+        if (bishop_magic_numbers[sq].attacks[(bishop_magic_numbers[sq].magicNumber * (allOccupiedSquares & bishop_magic_numbers[sq].mask)) >> (64-bishop_magic_numbers[sq].shift)] & sqToCheck) {return true;}
+        bishops &= bishops - 1;
+    }
+    while (rooks)
+    {
+        const int sq = __builtin_ctzll(rooks);
+        if (rook_magic_numbers[sq].attacks[(rook_magic_numbers[sq].magicNumber * (allOccupiedSquares & rook_magic_numbers[sq].mask)) >> (64-rook_magic_numbers[sq].shift)] & sqToCheck) {return true;}
+        rooks &= rooks - 1;
+    }
+    while (queens)
+    {
+        const int sq = __builtin_ctzll(queens);
+        queens &= queens - 1;
+        Bitboard diagonalQueenAttack = bishop_magic_numbers[sq].attacks[(bishop_magic_numbers[sq].magicNumber * (allOccupiedSquares & bishop_magic_numbers[sq].mask)) >> (64-bishop_magic_numbers[sq].shift)];
+        Bitboard perpendicularQueenAttack = rook_magic_numbers[sq].attacks[(rook_magic_numbers[sq].magicNumber * (allOccupiedSquares & rook_magic_numbers[sq].mask)) >> (64-rook_magic_numbers[sq].shift)];
+        if ((diagonalQueenAttack | perpendicularQueenAttack) & sqToCheck) {return true;}
+    }
+    
+    return false;
 }
 
 bool cBoard::inCheck(Side side) const
 {
     //could simply return isSquareAttacked(kingSq[side], ~side);
     //maybe there's a more optimal approach 
+    return isSquareAttacked(kingSq[side], oppositeSide(side));
 }
 
 uint64_t cBoard::hash() const {}
