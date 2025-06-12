@@ -40,7 +40,6 @@ enum Side : int
 {
     WHITE = 0,
     BLACK = 1,
-    NO_SIDE = -1
 };
 
 enum pieceType : int8_t 
@@ -100,20 +99,20 @@ enum moveFlags : int
     QUEEN_PROMO_CAPTURE = 15
 };
 
-inline Side oppositeSide(Side& side) {return side == Side::WHITE ? Side::BLACK : Side::WHITE;}
+inline Side oppositeSide(const Side side) {return side == Side::WHITE ? Side::BLACK : Side::WHITE;}
 
-inline Move encodeMove(Square& source, Square& dest, int& specInfo) 
+inline Move encodeMove(const Square source, const Square dest, const int specInfo) 
 {
-    return (specInfo << 12) | (dest << 6) | source;
+    return (specInfo << 12) | (source << 6) | dest;
 }
 
-inline Square sourceSquare(Move& move) {return move & 0x3F;}
-inline Square destSquare(Move& move) {return (move >> 6) & 0x3F;}
-inline int moveSpecInfo(Move& move) {return static_cast<int> (move>>12) & 0xF;}
+inline Square sourceSquare(const Move move) {return move & 0x3F;}
+inline Square destSquare(const Move move) {return (move >> 6) & 0x3F;}
+inline int moveSpecInfo(const Move move) {return static_cast<int> (move>>12) & 0xF;}
 
-inline pieceType getPieceType(pieceCode& pc) {
+inline pieceType getPieceType(const pieceCode pc) {
     if (pc == EMPTY) {return NO_PIECE;}
     return static_cast<pieceType>(pc % 6);
 }
 
-inline Bitboard fenMask(int& x, int& y) {return ((1ULL << ((8*x) + y)));}
+inline Bitboard fenMask(const int x, const int y) {return ((1ULL << ((8*x) + y)));}
