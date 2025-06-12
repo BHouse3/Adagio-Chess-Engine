@@ -113,3 +113,63 @@ void decodeHexMove(std::string& hexMove, std::ostream& out)
 
     out << "Destination Square: " << destSquare << "\nsourceSquare: " << sourceSquare << "\nSpecial Code: " << special << "\n\n";
 }
+
+std::string moveToString(Move encodedMove)
+{
+    Bitboard destSquare = (encodedMove & 0x0000003F);
+    Bitboard sourceSquare = ((encodedMove & 0x00000FC0) >> 6);
+    int special = (encodedMove & 0x0000F000) >> 12;
+
+    std::string output = "";
+
+    int sourceRank = sourceSquare/8;
+    int sourceFile = sourceSquare % 8;
+    switch (sourceFile)
+    {
+        case (0): output += "a"; break; 
+        case (1): output += "b"; break; 
+        case (2): output += "c"; break; 
+        case (3): output += "d"; break; 
+        case (4): output += "e"; break; 
+        case (5): output += "f"; break; 
+        case (6): output += "g"; break; 
+        case (7): output += "h"; break; 
+    }
+    output += std::to_string(sourceRank+1);
+
+    int destRank = destSquare/8;
+    int destFile = destSquare % 8;
+    switch (destFile)
+    {
+        case (0): output += "a"; break; 
+        case (1): output += "b"; break; 
+        case (2): output += "c"; break; 
+        case (3): output += "d"; break; 
+        case (4): output += "e"; break; 
+        case (5): output += "f"; break; 
+        case (6): output += "g"; break; 
+        case (7): output += "h"; break; 
+    }
+    output += std::to_string(destRank+1);
+
+    switch (special)
+    {
+        case (8): if (destRank == 7) {output += "N";} else {output += "n";} break;
+        case (9): if (destRank == 7) {output += "B";} else {output += "b";} break;
+        case (10): if (destRank == 7) {output += "R";} else {output += "r";} break;
+        case (11): if (destRank == 7) {output += "Q";} else {output += "q";} break;
+        case (12): if (destRank == 7) {output += "N";} else {output += "n";} break;
+        case (13): if (destRank == 7) {output += "B";} else {output += "b";} break;
+        case (14): if (destRank == 7) {output += "R";} else {output += "r";} break;
+        case (15): if (destRank == 7) {output += "Q";} else {output += "q";} break;
+    }
+
+    return output;
+}
+
+std::string decodeMove(Move m)
+{
+    std::string out = moveToString(m);
+    out += " Special Code: " + std::to_string((m & 0x0000F000) >> 12);
+    return out;
+}
